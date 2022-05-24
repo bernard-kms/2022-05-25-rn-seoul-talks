@@ -44,8 +44,6 @@ image: '/firebase-performance.png'
   - 동영상 녹화
   - Firebase Performance Monitoring(같은 것)
 
-e.g. <span class="font-700">"우리가 정의한 콜드 시작시간 지표가 유저평균 1초 이내가 되도록 한다"</span>
-
 ---
 
 # 불필요한 렌더링을 줄이자
@@ -57,45 +55,93 @@ e.g. <span class="font-700">"우리가 정의한 콜드 시작시간 지표가 �
 ## 왜 이렇게 자주 렌더링될까?
 - [why-did-you-render](https://github.com/welldone-software/why-did-you-render)
   - ...monkey patches React to notify you about potentially avoidable re-renders.
-- 레퍼런스 비교가 아닌 값 비교
 
 ---
 
-# 상태 업데이트가 모두 끝나기 전까지 렌더링을 막는다
-한번의 렌더링으로 최종 상태를 그리도록
-- e.g <span class="font-700">"홈 스크린을 렌더링하는 데 필요한 모든 상태가 준비 될 때 까지 스플래시 스크린에서 대기"</span>
-- `unstable_batchedUpdates()` from React
+## 왜 이렇게 자주 렌더링될까: 얕은 비교
 
 ```tsx
-useEffect(() => {
-  (async () => {
-    setLoading(true);
-    // some async state updates...
-    unstable_batchedUpdates(() => {
-      // some heady state updates...
-    });
-    setLoading(false);
-  })();
-}, []);
+const [user, setUser] = useState({ id: 1, name: '헤드위그' });
 
-if (loading) {
-  <Loading />
-}
+useEffect(() => {
+  // some effect
+}, [user]);
+
+return (
+  <UserProfile user={user}/>
+)
+```
+👇
+```tsx
+const [user, setUser] = useState({ id: 1, name: '헤드위그' });
+
+useEffect(() => {
+  // some effect
+}, [user.id, user.name]);
+
+return (
+  <UserProfile userId={user.id} userName={user.name}/>
+)
+```
+
+---
+
+## unstable_batchedUpdates
+
+```tsx
+import { unstable_batchedUpdates } from 'react';
+
+useEffect(() => {
+  unstable_batchedUpdates(() => {
+    // some heavy state updates...
+  });
+}, []);
 
 return (
   <Component ...>
 )
 ```
+
+---
+
+# 워터폴 멈춰!
+홈 스크린에 필요한 모든 상태가 준비 될 때 까지 스플래시 스크린에서 대기
+
+```tsx
+import { unstable_batchedUpdates } from 'react';
+
+useEffect(() => {
+  (async () => {
+    // some async actions...
+    hideSplash();
+  })();
+}, []);
+
+return (
+  <App ...>
+)
+```
+
+---
+
+# 가능하다면 네이티브 구현
+같은 구현이 네이티브 코드로도 존재한다면, 그것을 선택 (없다면 만들어도...)
+
+- `firebase-js-sdk` 👉 `react-native-firebase`
+- `useNativeDriver: true` in `Animation`
+- `list.map(...)` 👉 `FlatList`, `VirtualizedList`
+
 ---
 layout: image-right
 image: '/react-native-firebase.png'
 ---
 
-# 네이티브 코드의 병목
+# ...네이티브 코드의 병목
 서드파티 라이브러리, 혹은 우리가 짠 네이티브 코드
 
 - `react-native-firebase`의 병목
 - RN core 컴포넌트의 병목
+  - e.g [react-native-fast-image](https://github.com/DylanVann/react-native-fast-image)
 
 ---
 layout: image-right
