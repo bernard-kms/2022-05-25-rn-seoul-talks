@@ -61,11 +61,13 @@ image: '/firebase-performance.png'
 ## 왜 이렇게 자주 렌더링될까: 값 비교
 
 ```tsx
-const [user, setUser] = useState({ id: 1, name: '헤드위그' });
+const [user, setUser] = useState({ id: 1, name: '헤드위그', score: 10 });
 
 useEffect(() => {
-  // some effect
+  someEffect(user.name);
 }, [user]);
+
+  setUser({ id: 1, name: '헤드위그', score: 11 });
 
 return (
   <UserProfile user={user}/>
@@ -73,14 +75,12 @@ return (
 ```
 👇
 ```tsx
-const [user, setUser] = useState({ id: 1, name: '헤드위그' });
-
 useEffect(() => {
   // some effect
-}, [user.id, user.name]);
+}, [user.name]);
 
 return (
-  <UserProfile userId={user.id} userName={user.name}/>
+  <UserProfile userName={user.name}/>
 )
 ```
 
@@ -104,7 +104,7 @@ return (
   <Component ...>
 )
 ```
-- React 18부터는 필요가 없다 (=ReactNative 0.69)
+- React 18부터는 필요없다(=ReactNative 0.69)
 ---
 
 # 워터폴 멈춰
