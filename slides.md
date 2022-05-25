@@ -38,9 +38,9 @@ image: '/firebase-performance.png'
 ---
 
 # 목표 정하기
-- 목표가 날카롭지 않으면 작업 예측 😵
-- 뇌피셜, 기분으로 작업 🙅
-- 정량적, 정성적 뭐든 👌
+- 목표가 날카롭지 않으면 작업 예측이 어렵다
+- 뇌피셜, 기분으로 작업하지 않는다
+- 정량적, 정성적 뭐든 좋다
   - 동영상 녹화
   - Firebase Performance Monitoring(같은 것)
 
@@ -48,8 +48,8 @@ image: '/firebase-performance.png'
 
 # 불필요한 렌더링을 줄이자
 
-- 잦은 컴포넌트 리렌더링이 병목현상을 일으킨다
-- 사실 React의 지식을 그대로 적용할 수 있다: memoization, pure component, immutable data structures
+- 잦은 컴포넌트 업데이트가 JS와 네이티브 모두에게 병목
+- memoization, pure component, immutable data structures, ...
   - 👉 [https://reactjs.org/docs/optimizing-performance.html](https://reactjs.org/docs/optimizing-performance.html)
 
 ## 왜 이렇게 자주 렌더링될까?
@@ -58,7 +58,7 @@ image: '/firebase-performance.png'
 
 ---
 
-## 왜 이렇게 자주 렌더링될까: 얕은 비교
+## 왜 이렇게 자주 렌더링될까: 값 비교
 
 ```tsx
 const [user, setUser] = useState({ id: 1, name: '헤드위그' });
@@ -86,13 +86,16 @@ return (
 
 ---
 
-## unstable_batchedUpdates
+## 왜 이렇게 자주 렌더링될까
 
 ```tsx
 import { unstable_batchedUpdates } from 'react';
 
-useEffect(() => {
+const someCallback = useCallback(() => {
   unstable_batchedUpdates(() => {
+    setA(a);
+    setB(b);
+    setC(c);
     // some heavy state updates...
   });
 }, []);
@@ -101,19 +104,19 @@ return (
   <Component ...>
 )
 ```
-
+- React 18부터는 필요가 없다 (=ReactNative 0.69)
 ---
 
-# 워터폴 멈춰!
-홈 스크린에 필요한 모든 상태가 준비 될 때 까지 스플래시 스크린에서 대기
+# 워터폴 멈춰
+홈 스크린의 모든 상태가 준비 될 때 까지 스플래시 스크린에서 대기
 
 ```tsx
 import { unstable_batchedUpdates } from 'react';
 
 useEffect(() => {
   (async () => {
-    // some async actions...
-    hideSplash();
+    // some actions...
+    hideSplashScreen();
   })();
 }, []);
 
@@ -127,9 +130,9 @@ return (
 # 가능하다면 네이티브 구현
 같은 구현이 네이티브 코드로도 존재한다면, 그것을 선택 (없다면 만들어도...)
 
-- `firebase-js-sdk` 👉 `react-native-firebase`
-- `useNativeDriver: true` in `Animation`
-- `list.map(...)` 👉 `FlatList`, `VirtualizedList`
+- firebase-js-sdk 👉 react-native-firebase
+- `useNativeDriver: true` in Animation
+- `list.map(...)` 👉 FlatList, VirtualizedList
 
 ---
 layout: image-right
