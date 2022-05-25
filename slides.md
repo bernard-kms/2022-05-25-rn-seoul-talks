@@ -29,8 +29,6 @@ image: '/app-intro.jpg'
 - 멀티플랫폼을 위해 데이터베이스에 정보 저장
 - Firebase를 이용하여 (거의)모든 로직이 앱에 존재
 
-## 김민식
-- 이 앱을 2년간 만들어옴
 
 ---
 layout: image-right
