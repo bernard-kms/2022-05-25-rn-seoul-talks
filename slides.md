@@ -37,7 +37,7 @@ image: '/firebase-performance.png'
 
 # 목표 정하기
 - 목표가 날카롭지 않으면 산으로 간다
-- 뇌피셜, 기분으로 작업하지 않는다
+- 성능이 개선되면 무엇이 달라지는가?
 - 정량적, 정성적 뭐든 좋다
   - 동영상 녹화
   - Firebase Performance Monitoring(같은 것)
